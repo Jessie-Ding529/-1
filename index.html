@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSK4级 选词填空练习 - 旅行主题</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                        accent: '#0ea5e9',
+                        success: '#22c55e',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        light: '#f8fafc',
+                        dark: '#1e293b'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.5s ease-in-out',
+                        'bounce-in': 'bounceIn 0.5s ease-in-out',
+                        'shake': 'shake 0.5s ease-in-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '70%': { transform: 'scale(1.05)', opacity: '1' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        },
+                        shake: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '25%': { transform: 'translateX(-5px)' },
+                            '75%': { transform: 'translateX(5px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-all-300 {
+                transition: all 300ms ease-in-out;
+            }
+            .bg-gradient-blue {
+                background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
+            }
+            .word-option {
+                @apply bg-white border border-gray-300 rounded-lg px-4 py-2 cursor-pointer transition-all-300 shadow-sm hover:bg-primary hover:text-white hover:border-primary hover:shadow-md;
+            }
+            .word-option.selected {
+                @apply bg-primary text-white border-primary shadow-md;
+            }
+            .blank-space {
+                @apply border-b-2 border-dashed border-gray-400 w-24 h-8 mx-1 inline-block text-center align-bottom transition-all-300 hover:border-primary focus:outline-none focus:border-primary;
+            }
+            .blank-space.correct {
+                @apply border-success bg-green-50;
+            }
+            .blank-space.incorrect {
+                @apply border-danger bg-red-50 animate-shake;
+            }
+            .tooltip {
+                @apply invisible absolute bg-dark text-white text-xs rounded py-1 px-2 -mt-8 opacity-0 transition-all-300 whitespace-nowrap;
+            }
+            .has-tooltip:hover .tooltip {
+                @apply visible opacity-100 z-50;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <header class="bg-gradient-blue text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i class="fa fa-book text-2xl mr-3"></i>
+                    <h1 class="text-2xl md:text-3xl font-bold text-shadow">HSK4级 选词填空练习</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="helpBtn" class="bg-white/20 hover:bg-white/30 transition-all-300 rounded-full p-2">
+                        <i class="fa fa-question-circle text-xl"></i>
+                    </button>
+                    <button id="restartBtn" class="bg-white/20 hover:bg-white/30 transition-all-300 rounded-full p-2">
+                        <i class="fa fa-refresh text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
+            <div class="p-6 md:p-8">
+                <div class="mb-6">
+                    <div class="flex items-center mb-2">
+                        <span class="bg-primary text-white text-sm font-medium px-3 py-1 rounded-full">
+                            主题: 旅行
+                        </span>
+                        <span class="ml-3 text-gray-500 text-sm">难度: HSK4级</span>
+                    </div>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800">自助游 vs 跟团游</h2>
+                </div>
+
+                <div id="sentenceContainer" class="mb-8 text-lg md:text-xl leading-relaxed text-gray-700">
+                    旅行选择自助游还是跟团游，<span class="blank-space" data-index="0" tabindex="0"></span>，和个人喜好有关。<span class="blank-space" data-index="1" tabindex="0"></span>喜欢自由的人<span class="blank-space" data-index="2" tabindex="0"></span>，自助游更合适，因为可以自己安排行程；<span class="blank-space" data-index="3" tabindex="0"></span>自助游需要自己安排交通和住宿，<span class="blank-space" data-index="4" tabindex="0"></span>要提前做好准备，<span class="blank-space" data-index="5" tabindex="0"></span>遇到麻烦。<span class="blank-space" data-index="6" tabindex="0"></span>希望轻松一点，跟团游是个不错的选择。但是有些人觉得跟团游也有缺点，比如有时要在购物商场停留很久，<span class="blank-space" data-index="7" tabindex="0"></span>浪费时间；但也有人认为，<span class="blank-space" data-index="8" tabindex="0"></span>跟团游有缺点，他们<span class="blank-space" data-index="9" tabindex="0"></span>会选择这个旅游方式，因为这会让他们的旅行更加轻松。
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">选择合适的词语填空:</h3>
+                    <div id="wordOptions" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                        <!-- 词语选项将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <div id="feedbackMessage" class="hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center">
+                        <i class="fa fa-check-circle mr-2"></i>
+                        <span>恭喜你，全部填对了！</span>
+                    </div>
+                    <button id="checkBtn" class="bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded-lg transition-all-300 shadow-md hover:shadow-lg flex items-center">
+                        <i class="fa fa-check mr-2"></i>
+                        检查答案
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 max-w-4xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
+            <div class="p-6 md:p-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fa fa-lightbulb-o text-warning mr-2"></i>
+                    学习提示
+                </h3>
+                <div class="text-gray-700 space-y-3">
+                    <p><strong>一般来说：</strong>表示通常情况，用于引出一般性的结论或规律。</p>
+                    <p><strong>对于...来说：</strong>用于指出某个观点或情况适用的对象。</p>
+                    <p><strong>若：</strong>表示假设，相当于"如果"。</p>
+                    <p><strong>由于...因此...：</strong>用于表示因果关系。</p>
+                    <p><strong>以免：</strong>表示避免发生某种不希望的情况。</p>
+                    <p><strong>简直：</strong>表示完全如此，含有夸张的语气。</p>
+                    <p><strong>即使...仍然...：</strong>表示让步关系，相当于"就算...还是..."。</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 帮助模态框 -->
+    <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 animate-fade-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">如何使用</h3>
+                    <button id="closeHelpBtn" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="text-gray-700 space-y-3">
+                    <p>1. 从下方的词语选项中选择合适的词。</p>
+                    <p>2. 点击你选择的词，然后点击文中的空白处进行填空。</p>
+                    <p>3. 填完所有空白后，点击"检查答案"按钮。</p>
+                    <p>4. 正确的答案会显示为绿色，错误的会显示为红色。</p>
+                    <p>5. 可以点击"重新开始"按钮重新练习。</p>
+                </div>
+                <div class="mt-6">
+                    <button id="gotItBtn" class="w-full bg-primary hover:bg-primary/90 text-white font-medium px-4 py-2 rounded-lg transition-all-300">
+                        我知道了
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成功模态框 -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 animate-bounce-in">
+            <div class="p-6 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-success/20 text-success mb-4">
+                    <i class="fa fa-trophy text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">太棒了！</h3>
+                <p class="text-gray-600 mb-6">你已经成功完成了这次选词填空练习！</p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="viewAnswersBtn" class="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 font-medium px-4 py-2 rounded-lg transition-all-300">
+                        查看答案
+                    </button>
+                    <button id="newExerciseBtn" class="flex-1 bg-primary hover:bg-primary/90 text-white font-medium px-4 py-2 rounded-lg transition-all-300">
+                        重新开始
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 正确答案
+        const correctAnswers = [
+            "一般来说",
+            "对于",
+            "来说",
+            "由于",
+            "因此",
+            "以免",
+            "若",
+            "简直",
+            "即使",
+            "仍然"
+        ];
+
+        // 打乱顺序的词语选项
+        let wordOptions = [
+            "一般来说",
+            "对于",
+            "来说",
+            "由于",
+            "因此",
+            "以免",
+            "若",
+            "简直",
+            "即使",
+            "仍然"
+        ];
+
+        // 当前选中的词语索引
+        let selectedWordIndex = -1;
+
+        // 用户的答案
+        let userAnswers = new Array(correctAnswers.length).fill("");
+
+        // DOM元素
+        const wordOptionsContainer = document.getElementById('wordOptions');
+        const blankSpaces = document.querySelectorAll('.blank-space');
+        const checkBtn = document.getElementById('checkBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const helpBtn = document.getElementById('helpBtn');
+        const closeHelpBtn = document.getElementById('closeHelpBtn');
+        const gotItBtn = document.getElementById('gotItBtn');
+        const helpModal = document.getElementById('helpModal');
+        const successModal = document.getElementById('successModal');
+        const viewAnswersBtn = document.getElementById('viewAnswersBtn');
+        const newExerciseBtn = document.getElementById('newExerciseBtn');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+
+        // 初始化游戏
+        function initGame() {
+            // 打乱词语选项顺序
+            wordOptions = shuffleArray([...wordOptions]);
+            
+            // 清空用户答案
+            userAnswers = new Array(correctAnswers.length).fill("");
+            
+            // 渲染词语选项
+            renderWordOptions();
+            
+            // 清空空白处
+            blankSpaces.forEach(space => {
+                space.textContent = "";
+                space.classList.remove('correct', 'incorrect');
+            });
+            
+            // 重置按钮状态
+            checkBtn.disabled = false;
+            checkBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            // 隐藏反馈信息和成功模态框
+            feedbackMessage.classList.add('hidden');
+            successModal.classList.add('hidden');
+        }
+
+        // 渲染词语选项
+        function renderWordOptions() {
+            wordOptionsContainer.innerHTML = '';
+            
+            wordOptions.forEach((word, index) => {
+                const wordElement = document.createElement('div');
+                wordElement.className = 'word-option';
+                wordElement.textContent = word;
+                wordElement.dataset.index = index;
+                
+                wordOptionsContainer.appendChild(wordElement);
+            });
+        }
+
+        // 选择词语
+        function selectWord(index) {
+            // 移除之前选中的词语样式
+            document.querySelectorAll('.word-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // 添加当前选中的词语样式
+            const selectedWord = document.querySelector(`.word-option[data-index="${index}"]`);
+            if (selectedWord) {
+                selectedWord.classList.add('selected');
+            }
+            
+            selectedWordIndex = index;
+        }
+
+        // 填空
+        function fillBlank(blankIndex) {
+            if (selectedWordIndex === -1) return;
+            
+            const selectedWord = wordOptions[selectedWordIndex];
+            
+            // 将选中的词语填入空白处
+            blankSpaces[blankIndex].textContent = selectedWord;
+            userAnswers[blankIndex] = selectedWord;
+            
+            // 移除选中的词语
+            wordOptions.splice(selectedWordIndex, 1);
+            
+            // 重新渲染词语选项
+            renderWordOptions();
+            
+            // 重置选中状态
+            selectedWordIndex = -1;
+        }
+
+        // 检查答案
+        function checkAnswers() {
+            let allCorrect = true;
+            
+            blankSpaces.forEach((space, index) => {
+                if (userAnswers[index] === correctAnswers[index]) {
+                    space.classList.add('correct');
+                } else {
+                    space.classList.add('incorrect');
+                    allCorrect = false;
+                }
+            });
+            
+            if (allCorrect) {
+                // 显示成功信息
+                feedbackMessage.classList.remove('hidden');
+                feedbackMessage.classList.add('animate-fade-in');
+                
+                // 延迟显示成功模态框
+                setTimeout(() => {
+                    successModal.classList.remove('hidden');
+                }, 1000);
+            } else {
+                // 显示错误提示
+                feedbackMessage.textContent = '有些答案不正确，请再试一次。';
+                feedbackMessage.classList.remove('hidden', 'bg-green-50', 'border-green-200', 'text-green-700');
+                feedbackMessage.classList.add('bg-red-50', 'border-red-200', 'text-red-700', 'animate-fade-in');
+            }
+        }
+
+        // 查看正确答案
+        function viewAnswers() {
+            blankSpaces.forEach((space, index) => {
+                space.textContent = correctAnswers[index];
+                
+                if (userAnswers[index] === correctAnswers[index]) {
+                    space.classList.add('correct');
+                } else {
+                    space.classList.add('incorrect');
+                }
+            });
+        }
+
+        // 打乱数组顺序
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // 事件监听
+        function setupEventListeners() {
+            // 为空白处添加点击和键盘事件
+            blankSpaces.forEach((space, index) => {
+                space.addEventListener('click', () => fillBlank(index));
+                
+                // 添加键盘支持
+                space.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        fillBlank(index);
+                    }
+                });
+            });
+            
+            // 使用事件委托为词语选项添加点击事件
+            wordOptionsContainer.addEventListener('click', (e) => {
+                const wordOption = e.target.closest('.word-option');
+                if (wordOption) {
+                    const index = parseInt(wordOption.dataset.index);
+                    selectWord(index);
+                }
+            });
+        }
+        
+        // 初始化时设置事件监听
+        setupEventListeners();
+
+        checkBtn.addEventListener('click', checkAnswers);
+        restartBtn.addEventListener('click', initGame);
+        helpBtn.addEventListener('click', () => helpModal.classList.remove('hidden'));
+        closeHelpBtn.addEventListener('click', () => helpModal.classList.add('hidden'));
+        gotItBtn.addEventListener('click', () => helpModal.classList.add('hidden'));
+        viewAnswersBtn.addEventListener('click', viewAnswers);
+        newExerciseBtn.addEventListener('click', () => {
+            successModal.classList.add('hidden');
+            initGame();
+        });
+
+        // 初始化游戏
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
